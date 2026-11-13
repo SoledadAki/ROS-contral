@@ -1,0 +1,23 @@
+# build outputs
+node_modules/
+dist/
+app/android/app/build/
+app/android/.gradle/
+app/android/local.properties
+app/android/capacitor-cordova-android-plugins/
+build/
+install/
+log/
+__pycache__/
+*.pyc
+.pytest_cache/
+app_dist/
+*.apk
+!release/C21-remote.apk
+
+# local scratch / machine specific (tmp/ holds one-off scripts with car credentials)
+tmp/
+tools/
+release/C21遥控-debug.apk
+.claude/
+.DS_Store

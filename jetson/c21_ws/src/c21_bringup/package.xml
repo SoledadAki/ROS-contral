@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>c21_bringup</name>
+  <version>0.1.0</version>
+  <description>C21 launch files and parameters.</description>
+  <maintainer email="kiku.senji.02@gmail.com">c21</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>c21_base</exec_depend>
+  <exec_depend>c21_safety</exec_depend>
+  <exec_depend>c21_gateway</exec_depend>
+  <exec_depend>c21_description</exec_depend>
+  <exec_depend>sllidar_ros2</exec_depend>
+  <exec_depend>orbbec_camera</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>nav2_map_server</exec_depend>
+  <exec_depend>nav2_amcl</exec_depend>
+  <exec_depend>nav2_controller</exec_depend>
+  <exec_depend>nav2_planner</exec_depend>
+  <exec_depend>nav2_behaviors</exec_depend>
+  <exec_depend>nav2_bt_navigator</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>nav2_regulated_pure_pursuit_controller</exec_depend>
+  <exec_depend>nav2_navfn_planner</exec_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

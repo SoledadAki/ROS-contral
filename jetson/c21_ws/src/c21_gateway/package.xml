@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>c21_gateway</name>
+  <version>0.1.0</version>
+  <description>C21 APP gateway: WebSocket control/state, MJPEG video, mode manager.</description>
+  <maintainer email="kiku.senji.02@gmail.com">c21</maintainer>
+  <license>MIT</license>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
+  <exec_depend>action_msgs</exec_depend>
+  <exec_depend>python3-aiohttp</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

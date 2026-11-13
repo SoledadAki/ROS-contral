@@ -1,0 +1,119 @@
+# Shared parameters for the always-on robot stack.
+c21_base:
+  ros__parameters:
+    port: /dev/ttyTHS0
+    baud: 115200
+    cmd_timeout: 0.3
+    send_rate: 20.0
+    zero_hold: 1.0
+    max_linear: 0.5          # hard cap in the driver; the arbiter applies the user limit
+    max_angular: 1.5
+    publish_tf: true
+    yaw_source: gyro
+    odom_scale_x: 1.0        # calibrate in P2 (vendor used 1.03 / 1.125)
+    odom_scale_y: 1.0
+    battery_empty_v: 8.4     # firmware battery byte = % of 8.4..12.6 V (3S 11.1 V 7800 mAh)
+    battery_full_v: 12.6
+    gimbal_limit: 0.78
+    gimbal_move_ms: 120
+
+c21_safety:
+  ros__parameters:
+    max_linear: 0.3
+    max_angular: 1.0
+    accel_linear: 0.8
+    accel_angular: 3.0
+    scan_guard: true         # lidar corridor guard (toggle from the APP)
+    depth_guard: true        # also stop for c21/depth_obstacles (low / overhanging things)
+    scan_yaw: 3.14159265
+    scan_x: 0.0853
+    robot_half_length: 0.15
+    robot_half_width: 0.13   # car is 25 cm wide (wheels +-0.125); was 0.15, too strict for narrow passages
+    stop_margin: 0.05        # user asked 2026-11-12 (was 0.10)
+    slow_zone: 0.35
+    slow_time: 1.0           # slow zone >= speed * slow_time
+    self_filter_margin: 0.01 # drop returns inside the footprint (gimbal mast)
+    min_hits: 2
+    self_range: 0.14         # returns closer than this are the robot itself -> shadowed rays
+    blind_speed: 0.08        # max speed toward a shadowed direction (e.g. straight back)
+    partial_blind_speed: 0.15 # path partly shadowed (sideways: rear half of the car unseen)
+    side_margin: 0.01        # extra width when sweeping (was 0.03) -> forward corridor 28 cm (was 36)
+    # lidar-frame degree pairs (0 = straight back, lidar is mounted yaw pi) where the shell
+    # blocks the beam and the lidar reports nothing; measured 2026-11-03, matches the CAD shell
+    blind_sectors_deg: [-82.0, -44.0, -12.0, 44.0, 48.0, 84.0]
+    # CAD (vendor yeahbot_c21_pi): body x +-0.136, wheels y +-0.125 -> 0.15 half sizes keep a margin
+
+c21_depth_obstacles:
+  ros__parameters:
+    # heights are above the floor (camera tilt / height fitted in the URDF 2026-11-12)
+    min_height: 0.035        # floor fit noise is +-1.5 cm; lower things (door sills, flat cables) pass
+    max_height: 0.32         # car top 0.26 + margin; higher things (table tops) do not block
+    range_min: 0.15
+    range_max: 1.6
+    stride: 2                # 320 x 240 points per frame
+    cell: 0.03
+    min_pixels: 4            # pixels per cell before it counts
+    confirm_frames: 2        # consecutive frames before a cell counts (edge pixels flicker)
+    memory_s: 10.0           # keep cells out of view (closer than ~0.4 m the floor is unseen)
+    memory_radius: 1.2
+    max_rate: 10.0
+
+c21_gateway:
+  ros__parameters:
+    port: 8080
+    lease_s: 0.5
+    state_hz: 5.0
+    scan_hz: 5.0
+    scan_yaw: 3.14159265
+    scan_x: 0.0853
+    static_dir: /ws/app_dist
+
+c21_behavior:
+  ros__parameters:
+    scan_yaw: 3.14159265
+    scan_x: 0.0853
+    self_range: 0.14
+    robot_half_length: 0.15  # measured 27 x 25 cm (lidar 6 cm behind the front); 30 x 30 keeps a margin
+    robot_half_width: 0.15
+    turn_radius: 0.24        # nothing closer than this to the centre before turning in place
+    avoid_speed: 0.15
+    avoid_threshold: 0.45    # free corridor ahead (from the front bumper) before it turns
+    avoid_turn_w: 0.6
+    avoid_side_margin: 0.05  # corridor half width = robot_half_width + this
+    avoid_flank: 0.10        # things this far outside the corridor (front half) push the car sideways
+    avoid_side_speed: 0.05
+    avoid_esc_speed: 0.05    # too close to turn: slide sideways / creep back at this speed
+    avoid_esc_s: 3.0         # give up (stuck) after escaping this long
+    follow_range: 1.2        # only picks up things this close, within +-follow_fov_deg ahead
+    follow_fov_deg: 70.0
+    follow_acquire_range: 1.0   # a new target must start right in front (not a wall at the side)
+    follow_acquire_fov_deg: 30.0
+    follow_keep: 0.45        # centre -> target, i.e. about 30 cm from the front bumper
+    follow_speed: 0.2
+    follow_back_speed: 0.08
+    follow_max_w: 0.8
+    guard_range: 1.5
+    guard_delta: 0.25        # must be this much closer than the remembered scene
+    guard_learn_s: 2.0
+    guard_beep_every: 4.0
+    guard_max_w: 0.8
+    guard_gate: 0.4          # how far a tracked target may move between scans
+    guard_still_rate: 0.1    # rad/s: only look for new things below this turn rate ...
+    guard_settle_s: 0.3      # ... held this long (a turning lidar smears the scan)
+    guard_heal_s: 1.5        # a spot reading clearly farther this long updates the scene
+    # vision_follow (YOLO person boxes from the host c21-yolo service + depth for the distance)
+    vision_acquire_range: 2.5   # lock on to the person within this distance ...
+    vision_acquire_fov_deg: 20.0  # ... and this many degrees of straight ahead, seen 3 frames in a row
+    vision_keep: 1.0         # target distance; closer than ~1 m the camera only sees legs
+    vision_speed: 0.3
+    vision_back_speed: 0.08
+    vision_max_w: 0.9
+    vision_lost_s: 1.0       # unseen longer: only taken back when the clothes colour matches
+    vision_forget_s: 20.0    # unseen longer: lock on to whoever stands in front again
+    vision_search_s: 6.0     # lost at the side: turn that way this long
+    vision_avoid: true       # slide round things between the car and the person (lidar + depth)
+    vision_avoid_clear: 0.45 # detour when the free way towards the person is shorter than this
+    vision_avoid_speed: 0.15 # detour speed (sideways is partly lidar-blind: arbiter caps 0.15)
+    vision_lidar: true       # lidar person blobs keep the track between / beyond camera frames
+    vision_lidar_gate: 0.3   # blob this near the track (+ walk speed x time unseen) is the target
+    vision_doubt_s: 2.5      # target should be in the picture but camera has not confirmed it: drop

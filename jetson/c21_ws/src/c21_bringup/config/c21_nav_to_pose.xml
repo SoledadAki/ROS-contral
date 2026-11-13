@@ -1,0 +1,35 @@
+<!--
+  C21 NavigateToPose behaviour tree (default tree minus Spin / BackUp).
+
+  * The global path is re-planned at 1 Hz, so a new obstacle seen by the lidar is routed around.
+  * No path / controller stuck: clear the costmaps (stale marks of things that have moved away),
+    wait 3 s for the scan to re-mark what is really there, try again. A person walking past just
+    makes the car pause; a truly blocked route fails after ~10 rounds (~40-60 s).
+  * No Spin or BackUp: the rear is the lidar's blind side, reversing would be blind.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="10" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithReplanning">
+        <RateController hz="1.0">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <Sequence name="ClearAndWait">
+          <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+          <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          <Wait wait_duration="3"/>
+        </Sequence>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

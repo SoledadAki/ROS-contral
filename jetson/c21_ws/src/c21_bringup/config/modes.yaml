@@ -1,0 +1,31 @@
+# Feature modes started by the gateway. motion: true -> stopped on e-stop / APP loss.
+# group: modes sharing a group are mutually exclusive.
+modes:
+  mapping:
+    label: 建图（用摇杆开一圈，地图实时显示）
+    group: nav
+    motion: false
+    cmd: [ros2, launch, c21_bringup, mapping.launch.py]
+  navigation:
+    label: 导航（在地图上点目标）
+    group: nav
+    motion: false                 # the gateway cancels goals on e-stop / APP loss / joystick
+    cmd: [ros2, launch, c21_bringup, navigation.launch.py]
+    args: [map]
+  lidar_avoid:
+    label: 雷达避障（自己往前走，遇到障碍转开）
+    group: lidar
+    motion: true
+    cmd: [ros2, launch, c21_bringup, lidar_behavior.launch.py, behavior:=avoid]
+  # lidar_follow (lidar only, 30 cm) merged into vision_follow 2026-11-12; still runnable with
+  # ros2 launch c21_bringup lidar_behavior.launch.py behavior:=follow
+  lidar_guard:
+    label: 雷达警卫（原地不走，有人靠近就转过去并鸣笛）
+    group: lidar
+    motion: true
+    cmd: [ros2, launch, c21_bringup, lidar_behavior.launch.py, behavior:=guard]
+  vision_follow:
+    label: 跟随（摄像头认人 + 雷达定位，跟着启动时站在正前方的人，保持约 1 m）
+    group: lidar
+    motion: true
+    cmd: [ros2, launch, c21_bringup, vision_follow.launch.py]

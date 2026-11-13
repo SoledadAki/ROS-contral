@@ -1,0 +1,7 @@
+[Unit]
+Description=C21 WiFi watchdog (reconnect when the gateway is unreachable)
+After=NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/c21-wifi-watchdog.sh

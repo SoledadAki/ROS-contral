@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- Frames copied from vendor yeahbot_c21_pi.urdf. lidar yaw is the vendor nominal (pi);
+     verify against the real scan in P2 and override with lidar_yaw. -->
+<robot name="c21" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="lidar_yaw" default="3.14159265"/>
+  <xacro:macro name="box_link" params="name x y z rgba">
+    <link name="${name}">
+      <visual><geometry><box size="${x} ${y} ${z}"/></geometry>
+        <material name="${name}_mat"><color rgba="${rgba}"/></material></visual>
+    </link>
+  </xacro:macro>
+
+  <link name="base_footprint"/>
+  <link name="base_link">
+    <visual><origin xyz="0 0 0.07"/><geometry><box size="0.26 0.2 0.06"/></geometry>
+      <material name="body"><color rgba="0.15 0.15 0.18 1"/></material></visual>
+    <collision><origin xyz="0 0 0.07"/><geometry><box size="0.30 0.28 0.12"/></geometry></collision>
+  </link>
+  <joint name="base_joint" type="fixed"><parent link="base_footprint"/><child link="base_link"/></joint>
+
+  <link name="imu_link"/>
+  <joint name="imu_joint" type="fixed"><parent link="base_link"/><child link="imu_link"/>
+    <origin xyz="-0.0531 0.0196 0.1060" rpy="0 0 0"/></joint>
+
+  <link name="lidar_link">
+    <visual><geometry><cylinder radius="0.028" length="0.04"/></geometry>
+      <material name="lidar"><color rgba="0.1 0.1 0.1 1"/></material></visual>
+  </link>
+  <joint name="lidar_joint" type="fixed"><parent link="base_link"/><child link="lidar_link"/>
+    <origin xyz="0.0853 -0.0001 0.1089" rpy="0 0 $(arg lidar_yaw)"/></joint>
+
+  <xacro:box_link name="arm_0_link" x="0.04" y="0.05" z="0.04" rgba="0.3 0.3 0.3 1"/>
+  <joint name="arm_0_joint" type="revolute"><parent link="base_link"/><child link="arm_0_link"/>
+    <origin xyz="0.0112 0 0.1493" rpy="0 0 0"/><axis xyz="0 0 -1"/>
+    <limit lower="-0.785" upper="0.785" effort="1" velocity="1"/></joint>
+
+  <xacro:box_link name="camera_link" x="0.03" y="0.09" z="0.03" rgba="0.2 0.2 0.6 1"/>
+  <joint name="camera_joint" type="fixed"><parent link="arm_0_link"/><child link="camera_link"/>
+    <!-- tilt + height fitted to the floor seen in the depth image (2026-11-12, gimbal at 0):
+         the camera looks 2.8 deg down, 4.2 deg rolled and sits 2 cm higher than the CAD value 0.0681 -->
+    <origin xyz="0.0441 0.0002 0.0880" rpy="0.074 0.049 0"/></joint>
+
+  <xacro:macro name="wheel" params="name x y">
+    <link name="wheel_${name}_link">
+      <visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius="0.04" length="0.035"/></geometry>
+        <material name="wheel"><color rgba="0.8 0.6 0.1 1"/></material></visual>
+    </link>
+    <joint name="wheel_${name}_joint" type="fixed"><parent link="base_link"/><child link="wheel_${name}_link"/>
+      <origin xyz="${x} ${y} 0.0393"/></joint>
+  </xacro:macro>
+  <xacro:wheel name="lf" x="0.0848" y="0.1163"/>
+  <xacro:wheel name="rf" x="0.0848" y="-0.1163"/>
+  <xacro:wheel name="lb" x="-0.0932" y="0.1163"/>
+  <xacro:wheel name="rb" x="-0.0932" y="-0.1163"/>
+</robot>

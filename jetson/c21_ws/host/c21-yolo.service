@@ -1,0 +1,14 @@
+# User service on the Jetson host (not in the container): person detector for vision_follow.
+#   cp c21-yolo.service ~/.config/systemd/user/ && systemctl --user daemon-reload
+#   systemctl --user enable --now c21-yolo
+# The model loads on the first request and is freed after 2 min idle.
+[Unit]
+Description=C21 YOLO person detector (127.0.0.1:5577)
+
+[Service]
+ExecStart=/usr/bin/python3 %h/c21_ws/host/yolo_server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target
