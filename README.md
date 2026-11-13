@@ -16,8 +16,6 @@ Jetson Orin NX 上的 ROS2 Humble 全栈 + 平板 APP（Vue 3 + Capacitor）。
 | 控制端 | 华为 MatePad（横屏），或任意浏览器打开 `http://小车IP:8080` |
 | 网络 | WiFi；车上装有 WiFi 看门狗，网关失联会自动重连当前连接 |
 
-下位机固件不在本仓库，也不需要改动。
-
 ## 软件结构
 
 ```
@@ -126,5 +124,4 @@ cd android && ./gradlew assembleDebug   # 需要 Android SDK，APK 在 app/andro
 
 - 涉及车轮转动的测试，先架空，再地面低速；默认限速 0.3 m/s、1.0 rad/s。
 - 网关心跳（≥5 Hz）丢失、急停、雷达或深度近距障碍都会停车；导航在网络中断时会暂停，15 秒内连回会继续。
-- 不要刷写 STM32 固件，不要改宿主机的 ROS1/CUDA 环境。
 - 网关默认不设令牌，只应在可信的局域网使用；需要时在参数里设 `token`。
